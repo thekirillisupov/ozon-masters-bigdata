@@ -1,10 +1,10 @@
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 from sklearn.impute import SimpleImputer
-from sklearn.preprocessing import StandardScaler, OneHotEncoder
+from sklearn.preprocessing import StandardScaler, OneHotEncoder, LabelEncoder, OrdinalEncoder
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split, GridSearchCV
-
+from xgboost import XGBClassifier
 #
 # Dataset fields
 #

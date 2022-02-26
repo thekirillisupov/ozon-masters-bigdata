@@ -40,7 +40,14 @@ logging.info(f"TRAIN_PATH {train_path}")
 # fileds = ["id","label"]+num_features 1 .. 13 + cat_features 1 .. 26 + "day_namber"
 
 read_table_opts = dict(sep="\t", names=fields, index_col=False, chunksize=10000)
-df = pd.read_table(train_path, **read_table_opts)
+reader = pd.read_table(train_path, **read_table_opts)
+
+df = pd.DataFrame()
+for i, chunk in enumerate(reader): 
+    if df.shape[0] > 1000000:
+        break
+    df = pd.concat([df, chunk.sample(frac=.05, replace=False, random_state=911)], axis=0)  
+
 
 #split train/test
 X_train, X_test, y_train, y_test = train_test_split(

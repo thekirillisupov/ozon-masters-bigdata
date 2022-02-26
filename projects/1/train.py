@@ -10,7 +10,7 @@ from joblib import dump
 #
 # Import model definition
 #
-from model import model, fields
+from model import modelfull, fields, modelpreprocess 
 
 
 #
@@ -50,9 +50,9 @@ X_train, X_test, y_train, y_test = train_test_split(
 #
 # Train the model
 #
-model.fit(X_train, y_train)
-
-model_score = model.score(X_test, y_test)
+modelfull.fit(X_train, y_train)
+modelpreprocess.fit(X_test, y_test)
+model_score = modelfull.score(X_test, y_test)
 
 logging.info(f"model score: {model_score:.3f}")
 

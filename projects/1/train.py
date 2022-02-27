@@ -10,7 +10,7 @@ from joblib import dump
 #
 # Import model definition
 #
-from model import modelfull, fields, modelpreprocess 
+from model import model, fields
 
 
 #
@@ -37,33 +37,30 @@ logging.info(f"TRAIN_PATH {train_path}")
 
 #
 # Read dataset
-# fileds = ["id","label"]+num_features 1 .. 13 + cat_features 1 .. 26 + "day_namber"
+#
 
-read_table_opts = dict(sep="\t", names=fields, index_col=False, chunksize=10000)
-reader = pd.read_table(train_path, **read_table_opts)
-
-df = pd.DataFrame()
-for i, chunk in enumerate(reader): 
-    if df.shape[0] > 1000000:
-        break
-    df = pd.concat([df, chunk.sample(frac=.05, replace=False, random_state=911)], axis=0)  
-
-
+read_table_opts = dict(sep="\t", names=fields, index_col=False)
+df = pd.read_table(train_path, **read_table_opts)
+#choose short cat features
+arr_num = [i for i in range(15)]
+arr_cat = [20,23,28,31,34,36,37]
+arr_fin=arr_cat+arr_num
+#df = df.iloc[:,sorted(arr_fin)]
+#print(df.columns)
 #split train/test
 X_train, X_test, y_train, y_test = train_test_split(
-    df.iloc[:,2:], df.iloc[:,1], test_size=0.33, random_state=42
+    df.iloc[:,2:], df.iloc[:,1], test_size=0.33, random_state=41
 )
 
 #
 # Train the model
 #
-modelfull.fit(X_train, y_train)
-modelpreprocess.fit(X_test, y_test)
-model_score = modelfull.score(X_test, y_test)
+model.fit(X_train, y_train)
+model_score = model.score(X_test, y_test)
 
 logging.info(f"model score: {model_score:.3f}")
 
 # save the model
-dump(modelfull, "{}.joblib".format(proj_id))
+dump(model, "{}.joblib".format(proj_id))
 
 

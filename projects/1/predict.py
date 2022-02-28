@@ -6,7 +6,7 @@ from joblib import load
 import pandas as pd
 
 sys.path.append('.')
-from model import fieldswithoutlabel
+from model import fieldswithoutlabel, fields
 
 #
 # Init the logger
@@ -22,7 +22,7 @@ model = load("1.joblib")
 
 #read and infere
 read_opts=dict(
-        sep='\t', names=fieldswithoutlabel, index_col=False, header=None,
+        sep='\t', names=fields, index_col=False, header=None,
         iterator=True, chunksize=100
 )
 

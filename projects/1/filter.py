@@ -68,8 +68,8 @@ for line in sys.stdin:
     #unpack into a tuple/dict
     values = line.rstrip().split('\t')
     hotel_record = dict(zip(fields, values)) #Hotel(values1)
-    #logging.info("dict {}".format(hotel_record))
-    #logging.info("outfields {}".format(outfields))
+    logging.info("dict {}".format(hotel_record))
+    logging.info("outfields {}".format(outfields))
     #apply filter conditions
     if filter_cond(hotel_record):
         output = ",".join([hotel_record[x] for x in outfields])

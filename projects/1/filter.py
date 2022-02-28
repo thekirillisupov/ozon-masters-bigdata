@@ -6,7 +6,7 @@ from glob import glob
 import logging
 
 sys.path.append('.')
-from model import fields, filedswithoutlabel
+from model import fields, fieldswithoutlabel
 
 fields = fieldswithoutlabel
 #

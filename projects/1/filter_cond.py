@@ -8,7 +8,7 @@ def filter_cond(line_dict):
     Returns True if conditions are satisfied
     """
     cond_match = (
-       20 < int(line_dict["if1"]) < 40 
+       line_dict["if1"] != '' and 20 < int(line_dict["if1"]) < 40 
     ) 
     return True if cond_match else False
 

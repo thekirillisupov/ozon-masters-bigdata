@@ -72,7 +72,7 @@ for line in sys.stdin:
     #logging.info("outfields {}".format(outfields))
     #apply filter conditions
     if filter_cond(hotel_record):
-        output = ",".join([hotel_record[x] for x in outfields])
+        output = "\t".join([hotel_record[x] for x in outfields])
         print(output)
 
 

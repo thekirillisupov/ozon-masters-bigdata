@@ -49,7 +49,7 @@ preprocessor = ColumnTransformer(
 # Now we have a full prediction pipeline.
 model = Pipeline(steps=[
     ('preprocessor', preprocessor),
-    ('linearregression', LogisticRegression(max_iter=10000, solver='sag',penalty='l2',C=0.9))
+    ('linearregression', LogisticRegression(max_iter=100, solver='sag',penalty='l2',C=0.9))
 ])
 
 

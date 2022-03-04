@@ -33,5 +33,5 @@ for df in pd.read_csv(sys.stdin, **read_opts):
     #df.iloc[:.sorted(arr_fin)]
     pred = model.predict_proba(df)[:, 1]
     out = zip(df.id, pred)
-    print("\n".join(["{0},{1}".format(*i) for i in out]))
+    print("\n".join(["{0}\t{1}".format(*i) for i in out]))
 

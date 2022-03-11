@@ -1,7 +1,3 @@
-CREATE DATABASE IF NOT EXISTS thekirillisupov;
-
-USE thekirillisupov;
-
 CREATE TEMPORARY EXTERNAL TABLE IF NOT EXISTS  hw2_test
 (  id INT,
    label INT,

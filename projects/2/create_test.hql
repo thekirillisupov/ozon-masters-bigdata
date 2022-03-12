@@ -45,4 +45,4 @@ CREATE TEMPORARY EXTERNAL TABLE IF NOT EXISTS  hw2_test
 ROW FORMAT DELIMITED 
 FIELDS TERMINATED BY '\t' 
 STORED AS TEXTFILE
-LOCATION /datasets/criteo/criteo_test_large_features;
+LOCATION '/datasets/criteo/criteo_test_large_features';

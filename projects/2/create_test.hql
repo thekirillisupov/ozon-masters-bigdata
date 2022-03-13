@@ -1,6 +1,5 @@
 CREATE TEMPORARY EXTERNAL TABLE IF NOT EXISTS  hw2_test
 (  id INT,
-   label INT,
    if1 INT,
    if2 INT,
    if3 INT,

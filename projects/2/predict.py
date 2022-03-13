@@ -27,10 +27,6 @@ read_opts=dict(
 )
 
 for df in pd.read_csv(sys.stdin, **read_opts):
-    arr_num = [i for i in range(15)]
-    arr_cat = [20, 23, 28, 31, 34, 36, 37]
-    arr_fin= arr_cat+arr_num
-    #df.iloc[:.sorted(arr_fin)]
     pred = model.predict_proba(df)[:, 1]
     out = zip(df.id, pred)
     print("\n".join(["{0}\t{1}".format(*i) for i in out]))

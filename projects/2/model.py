@@ -1,5 +1,6 @@
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
+import numpy as np
 from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import StandardScaler, OneHotEncoder, OrdinalEncoder, Normalizer
 from sklearn.linear_model import LinearRegression, LogisticRegression
@@ -36,7 +37,7 @@ numeric_transformer = Pipeline(steps=[
 
 categorical_transformer = Pipeline(steps=[
     ('imputer', SimpleImputer(strategy='constant', fill_value='missing')),
-	('onehot', OneHotEncoder(handle_unknown='ignore'))
+    ('onehot', OneHotEncoder(handle_unknown='ignore'))
 ])
 
 preprocessor = ColumnTransformer(

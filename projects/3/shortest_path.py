@@ -16,9 +16,9 @@ df = spark.read.csv(str(sys.argv[3]),sep="\t").cache()
 node1 = int(sys.argv[1])
 node2 = int(sys.argv[2])
 
-n1 = df.filter(df._c0 == 34)
+n1 = df.filter(df._c0 == node2)
 
-n2 = df.filter(df._c1 == 12)
+n2 = df.filter(df._c1 == node1)
 
 n1.createOrReplaceTempView("n1_table")
 

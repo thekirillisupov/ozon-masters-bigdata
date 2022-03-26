@@ -62,4 +62,4 @@ resdf = spark.createDataFrame([
     Row(resStr[:-1])
 ])
 
-resdf.write.csv(str(sys.argv[4])+".csv")
+resdf.write.csv(str(sys.argv[4]))

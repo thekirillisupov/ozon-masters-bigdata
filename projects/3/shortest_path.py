@@ -1,9 +1,15 @@
-from pyspark import SparkContext, SparkConf
+import os
 import sys
 
- 
-#conf = SparkConf()
-#sc = SparkContext(appName="Pagerank", conf=conf)
+SPARK_HOME = "/usr/hdp/current/spark2-client"
+PYSPARK_PYTHON = "/opt/conda/envs/dsenv/bin/python"
+os.environ["PYSPARK_PYTHON"]= PYSPARK_PYTHON
+os.environ["SPARK_HOME"] = SPARK_HOME
+
+PYSPARK_HOME = os.path.join(SPARK_HOME, "python/lib")
+sys.path.insert(0, os.path.join(PYSPARK_HOME, "py4j-0.10.9.3-src.zip"))
+sys.path.insert(0, os.path.join(PYSPARK_HOME, "pyspark.zip"))
+
 from pyspark import SparkConf
 from pyspark.sql import SparkSession
 
@@ -11,94 +17,133 @@ conf = SparkConf()
 
 spark = SparkSession.builder.config(conf=conf).appName("Spark SQL").getOrCreate()
 
-df = spark.read.csv(str(sys.argv[3]),sep="\t").cache()
+program_name = sys.argv[0]
+start = int(sys.argv[1])
+end = int(sys.argv[2])
+path_csv = sys.argv[3]
+out_csv = sys.argv[4]
 
-node1 = int(sys.argv[1])
-node2 = int(sys.argv[2])
-
-n1 = df.filter(df._c0 == node2)
-
-n2 = df.filter(df._c1 == node1)
-
-n1.createOrReplaceTempView("n1_table")
-
-n2.createOrReplaceTempView("n2_table")
-
-def shortest_path(node1, node2):
-    path_list = [[node1]]
-    path_index = 0
-    # To keep track of previously visited nodes
-    previous_nodes = {node1}
-    if node1 == node2:
-        return path_list[0]
-        
-    while path_index < len(path_list):
-        current_path = path_list[path_index]
-        last_node = current_path[-1]
-        next_nodes = df.filter(df._c0 == last_node).select(df._c1).rdd.map(lambda x: (int(x[0]))).collect() # here add df.filter(df._c1 == last_node)
-        # Search goal node
-        if node2 in next_nodes:
-            current_path.append(node2)
-            return current_path[::-1]
-        # Add new paths
-        for next_node in next_nodes[:4]: # optimise param
-            if not next_node in previous_nodes:
-                new_path = current_path[:]
-                new_path.append(next_node)
-                path_list.append(new_path)
-                # To avoid backtracking
-                previous_nodes.add(next_node)
-        # Continue to next path in list
-        path_index += 1
-    # No path is found
-    return []
-
-res=shortest_path(node2, node1)
-
-resStr=''
-for i in range(len(res)):
-    resStr += str(res[i])+','
-resStr[:-1]
-
-query = """
-SELECT n1_table._c0, n1_table._c1, n2_table._c1
-FROM
-n1_table JOIN n2_table
-ON n1_table._c1 = n2_table._c0
-"""
-
-res = spark.sql(query)
-
-#resRow
-
-resRow = res.collect()
-
-data = []
-for i in range(len(resRow)):
-    resRowstr = ''
-    for j in range(3):
-        resRowstr += resRow[i][2-j] + ','
-    data.append(resRowstr[:-1])
-
-#data
-
-from pyspark.sql import Row
-
-resdf = spark.createDataFrame([
-    Row(data[0]),
-    Row(data[1]),
-    Row(data[2]),
-    Row(data[3]),
-    Row(data[4])
+from pyspark.sql.types import *
+schema = StructType(fields=[
+    StructField("user_id", IntegerType()),
+    StructField("follower_id", IntegerType())
 ])
-#resdf
+df = spark.read\
+          .schema(schema)\
+          .format("csv")\
+          .option("sep", "\t")\
+          .load(path_csv)
 
-#file1 = open(str(sys.argv[4])+".csv", "w")  # write mode
-#file1.write(resStr[:-1])
-#file1.close()
 
-#resdf = spark.createDataFrame([
-#    Row(resStr[:-1])
-#])
+from pyspark.sql.functions import map_from_arrays, create_map, collect_list
+from pyspark.sql.functions import lit
 
-resdf.write.csv(str(sys.argv[4]))
+df_sort = df.orderBy('follower_id')
+new_list = df_sort.groupby("follower_id").agg(collect_list("user_id").alias("users_id"))
+new_list = new_list.withColumn('new_column', lit(1))
+df_for_maps = new_list.groupBy('new_column').agg(collect_list("follower_id").alias("new_users_id"),\
+                                   collect_list("users_id").alias("new_follower_id"))
+df_result = df_for_maps.select(map_from_arrays(df_for_maps.new_users_id, df_for_maps.new_follower_id).alias('result')).cache()
+
+
+class Node:
+    def __init__(self, value, pred=None, dist=None):
+        self.value = value
+        self.pred = []
+        self.distance = dist
+        self.path = []
+
+
+class Queue:
+    def __init__(self):
+        self.queue = []
+        self.start = 0
+        self.end = 0
+
+    def insert(self, x):
+        self.end += 1
+        self.queue.append(x)
+
+    def pop(self):
+        if self.end - self.start <= 0:
+            return None
+        else:
+            self.start += 1
+            return self.queue[self.start - 1]
+
+    def is_empty(self):
+        return self.start == self.end
+
+
+def get_childs(df_result, value):
+    return df_result.select(df_result.result.getItem(value)).first()[0]
+
+
+dict_complete = {}
+queue = Queue()
+
+node_start = Node(start, dist=0)
+dict_complete[start] = node_start
+queue.insert(node_start)
+
+max_dist = 0
+
+while not queue.is_empty():
+    current_node = queue.pop()
+    current_dist = current_node.distance
+
+    if max_dist:
+        if current_dist >= max_dist:
+            break
+
+    # get childs pyspark
+    childs = get_childs(df_result, current_node.value)
+    if childs is None:
+        continue
+    for child in childs:
+
+        if child in dict_complete:
+            child_node = dict_complete[child]
+            if child_node.distance == current_dist + 1:
+                child_node.pred.append(current_node)
+
+        else:
+            node_child = Node(child, dist=current_dist + 1)
+            node_child.pred.append(current_node)
+            dict_complete[child] = node_child
+            queue.insert(node_child)
+            if child == end:
+                max_dist = current_dist + 1
+                results = node_child
+
+def create_ways(result):
+    dict_complete = {}
+    start_path = [[]]
+    current_node = result
+    current_node.path = start_path
+    queue = Queue()
+    queue.insert(current_node)
+    dict_complete[current_node.value] = 1
+    while True:
+        current_node = queue.pop()
+        current_node.path = [x + [current_node.value] for x in current_node.path]
+
+        if current_node.pred == []:
+            return current_node.path
+
+        for pred_node in current_node.pred:
+
+            pred_node.path += current_node.path
+
+            if pred_node.value not in dict_complete:
+                dict_complete[pred_node.value] = 1
+                queue.insert(pred_node)
+
+
+ways = create_ways(results)
+ways = [way[::-1] for way in ways]
+data = ways
+spark_1 = SparkSession.builder.config(conf=conf).appName("well").getOrCreate()
+df = spark_1.createDataFrame(data)
+
+df.write.csv(out_csv, sep=',')

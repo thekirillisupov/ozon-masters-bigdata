@@ -30,7 +30,7 @@ schema = StructType([
 path = sys.argv[1]
 model_path = sys.argv[2]
 
-df = spark.read.json(path, schema=schema).cache()
+train_df = spark.read.json(path, schema=schema).cache()
 
-pipeline_model = pipeline.fit(train)
+pipeline_model = pipeline.fit(train_df)
 pipeline_model.write().overwrite().save(model_path)

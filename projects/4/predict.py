@@ -1,5 +1,12 @@
 import sys
 from pyspark.sql import SparkSession
+from pyspark.ml.feature import *
+from sklearn.metrics import classification_report, precision_score
+from pyspark.sql import functions as f
+from pyspark.sql.types import *
+from pyspark.ml.classification import LogisticRegression
+from pyspark.ml import Pipeline
+from pyspark.ml.pipeline import Transformer
 
 model_path = sys.argv[1]
 test_path = sys.argv[2]

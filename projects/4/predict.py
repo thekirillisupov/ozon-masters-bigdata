@@ -34,7 +34,7 @@ schema = StructType([
 ])
 
 df_test = spark.read.json(test_path, schema=schema).cache()
+df_test = df_test.withColumn('reviewText', f.regexp_replace('reviewText', '[^A-Za-z0-9\s]+', ''))
 
 predictions = pipeline_model.transform(df_test)
-
 predictions.write.csv(predict_path)

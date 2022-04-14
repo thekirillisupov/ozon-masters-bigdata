@@ -32,5 +32,7 @@ model_path = sys.argv[2]
 
 train_df = spark.read.json(path, schema=schema).cache()
 
+train_df = train_df.withColumn('reviewText', f.regexp_replace('reviewText', '[^A-Za-z0-9\s]+', ''))
+
 pipeline_model = pipeline.fit(train_df)
 pipeline_model.write().overwrite().save(model_path)

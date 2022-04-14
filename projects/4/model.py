@@ -32,15 +32,15 @@ class Remove_spec_char(Transformer):
         self.check_input_type(df.schema)
         return df.withColumn(self.outputCol, f.regexp_replace(self.inputCol, '[^A-Za-z0-9\s]+', ''))
 
-remove_spec_char = Remove_spec_char(inputCol="reviewText")
-tokenizerBig = Tokenizer(inputCol="reviewText_clear", outputCol="wordsBig")
+#remove_spec_char = Remove_spec_char(inputCol="reviewText")
+tokenizerBig = Tokenizer(inputCol="reviewText", outputCol="wordsBig")
 stop_words = StopWordsRemover.loadDefaultStopWords("english")
 swr = StopWordsRemover(inputCol=tokenizerBig.getOutputCol(), outputCol="words_filtered", stopWords=stop_words)
 count_vectorizerBig = CountVectorizer(inputCol=swr.getOutputCol(), outputCol="features")
 lr = LogisticRegression(featuresCol="features", labelCol="overall", maxIter=10, regParam=0)
 
 pipeline = Pipeline(stages=[
-    remove_spec_char,
+    #remove_spec_char,
     tokenizerBig,
     #tokenizerSmall,
     swr,

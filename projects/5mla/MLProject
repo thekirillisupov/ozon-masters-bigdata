@@ -1,0 +1,10 @@
+name: Kirill love pasta
+
+conda_env: conda.yaml
+
+entry_points:
+  main:
+    parameters:
+      data_file: path
+      paramC: {type: float, default: 0.9}
+    command: "python train.py {data_file} {paramC} "

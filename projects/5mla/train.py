@@ -72,7 +72,8 @@ if __name__ == "__main__":
     with mlflow.start_run():
         model.fit(X_train, y_train)
         model_score = model.score(X_test, y_test)
-	mlflow.log_metric("model_param1", paramC)
+        flparamC = float(paramC)
+        mlflow.log_metric("model_param1", flparamC)
         mlflow.log_metric("log_loss", model_score)
         mlflow.sklearn.log_model(model, "model")
 

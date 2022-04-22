@@ -5,6 +5,6 @@ conda_env: conda.yaml
 entry_points:
   main:
     parameters:
-      data_file: path
+      train_path: path
       paramC: {type: float, default: 0.9}
-    command: "python train.py {data_file} {paramC} "
+    command: "python train.py {train_path} {paramC} -r args"

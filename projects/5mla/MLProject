@@ -7,4 +7,4 @@ entry_points:
     parameters:
       train_path: path
       paramC: {type: float, default: 0.9}
-    command: "python train.py {train_path} {paramC} -r args"
+    command: "python train.py {train_path} {paramC}"

@@ -1,4 +1,3 @@
-#!/opt/conda/envs/dsenv/bin/python
 import mlflow
 import os, sys
 import pandas as pd

@@ -16,7 +16,7 @@ with DAG(
 
     feature_eng_task = SparkSubmitOperator(
 	task_id="feuture_eng_task",
-	application="{}preprocessing.py".format(base_dir),
+	application="{}/preprocessing.py".format(base_dir),
 	env_vars={"PYSPARK_PYTHON": "dsenv"}
 )
 

@@ -22,7 +22,7 @@ with DAG(
 
     train_task = BashOperator(
 	task_id = "train_task",
-	bash_command="python {}train.py {}thekirillisupov_train_out {}6.joblib".format(base_dir, base_dir, base_dir)
+	bash_command="python {}train.py {}thekirillisupov_train_out /user/thekirillisupov/6.joblib".format(base_dir, base_dir, base_dir)
 )
 
     model_sensor = BashSensor(

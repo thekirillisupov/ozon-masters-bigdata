@@ -5,15 +5,15 @@ import pyspark.sql.functions as F
 import pandas as pd
 from pyspark.ml.linalg import DenseVector
 
-path_test = 'Eelect_test_out'
-path_model = '6.joblib'
-path_predict = 'Eelect_hw6_prediction'
+path_test = './thekirillisupov_test_out'
+path_model = './6.joblib'
+path_predict = './thekirillisupov_hw6_prediction'
 
 schema = StructType(fields=[
     StructField("features", ArrayType(FloatType(),False))
 ])
 
-df_test = spark.read.json('Eelect_test_out', schema=schema).cache()
+df_test = spark.read.json('thekirllisuppov_test_out', schema=schema).cache()
 
 
 est = joblib.load(path_model)

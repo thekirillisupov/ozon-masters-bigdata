@@ -57,7 +57,7 @@ test_df = test_df.withColumn('reviewText', f.regexp_replace('reviewText', '[^A-Z
 tokenizer = Tokenizer(inputCol="reviewText", outputCol="words")
 stop_words = StopWordsRemover.loadDefaultStopWords("english")
 swr = StopWordsRemover(inputCol=tokenizer.getOutputCol(), outputCol="words_filtered", stopWords=stop_words)
-hasher = HashingTF(numFeatures=5000, binary=True, inputCol=swr.getOutputCol(), outputCol="features")
+hasher = HashingTF(numFeatures=333, binary=True, inputCol=swr.getOutputCol(), outputCol="features")
 
 train_df = tokenizer.transform(train_df)
 train_df = swr.transform(train_df)

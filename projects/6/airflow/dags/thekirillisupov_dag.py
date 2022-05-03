@@ -22,7 +22,7 @@ with DAG(
 
     train_task = BashOperator(
 	task_id = "train_task",
-	bash_command="python {}train.py {}thekirillisupov_train_out /user/thekirillisupov/6.joblib".format(base_dir, base_dir, base_dir)
+	bash_command="python {}train.py {}thekirillisupov_train_out /user/thekirillisupov/6.joblib".format(base_dir, base_dir)
 )
 
     model_sensor = BashSensor(
@@ -32,7 +32,7 @@ with DAG(
 
     predict_task = BashOperator(
 	task_id = "predict_task",
-	bash_command =  "python predict.py /user/thekirillisupov/6.joblib thekirillisupov_train_out /user/thekirillisupov/thekirillisupov_hw6_prediction"
+	bash_command =  "python {}predict.py /user/thekirillisupov/6.joblib {}thekirillisupov_train_out /user/thekirillisupov/thekirillisupov_hw6_prediction".format(base_dir, base_dir)
 )
 
     feature_eng_task >> train_download_task >> train_task >> model_sensor >> predict_task

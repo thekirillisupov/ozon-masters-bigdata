@@ -18,7 +18,7 @@ with DAG(
 
     download_train_task = BashOperator(
 	task_id="download_train_task",
-	bash_command="hdfs dfs -copyFromRemote thekirillisupov_train_out {}thekirillisupov_train_out_local".format(base_dir)
+	bash_command="hdfs dfs -get thekirillisupov_train_out/*.json {}thekirillisupov_train_out_local".format(base_dir)
 
     train_task = BashOperator(
 	task_id = "train_task",

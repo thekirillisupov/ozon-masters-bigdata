@@ -40,5 +40,5 @@ train_df = train_df.withColumn('reviewText', f.regexp_replace('reviewText', '[^A
 test_df = spark.read.json(test_path, schema=schema_test).cache()
 test_df = test_df.withColumn('reviewText', f.regexp_replace('reviewText', '[^A-Za-z0-9\s]+', ''))
 
-train_df.write.csv("thekirillisupov_train_out")
-test_df.write.csv("thekirllisupov_test_out")
+train_df.write.parquet("thekirillisupov_train_out")
+test_df.write.parquet("thekirllisupov_test_out")

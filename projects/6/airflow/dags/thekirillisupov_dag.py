@@ -26,7 +26,7 @@ with DAG(
 )
     train_task = BashOperator(
 	task_id = "train_task",
-	bash_command="python {}train.py {}thekirillisupov_train_out {}6.joblib".format(base_dir, base_dir, base_dir)
+	bash_command="python3 {}train.py {}thekirillisupov_train_out_local {}6.joblib".format(base_dir, base_dir, base_dir)
 )
 
     model_sensor = FileSensor(

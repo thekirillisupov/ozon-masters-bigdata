@@ -17,7 +17,7 @@ with DAG(
     feature_eng_task = SparkSubmitOperator(
 	task_id="feuture_eng_task",
 	application="{}/preprocessing.py".format(base_dir),
-	env_vars={"PYSPARK_PYTHON": "opt/conda/envs/dsenv"}
+	env_vars={"PYSPARK_PYTHON": "/opt/conda/envs/dsenv/bin/python"}
 )
 
     download_train_task = BashOperator(
@@ -38,7 +38,7 @@ with DAG(
     predict_task = SparkSubmitOperator(
 	task_id = "predict_task",
 	application =  "{}predict.py".format(base_dir),
-	env_vars={"PYSPARK_PYTHON": "opt/conda/envs/dsenv"}
+	env_vars={"PYSPARK_PYTHON": "/opt/conda/envs/dsenv/bin/python"}
 )
 
     feature_eng_task >> download_train_task >> train_task >> model_sensor >> predict_task

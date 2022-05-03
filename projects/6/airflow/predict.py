@@ -1,30 +1,29 @@
-import sys
-from pyspark.sql import SparkSession
-from pyspark.ml.feature import *
-from sklearn.metrics import classification_report, precision_score
-from pyspark.sql import functions as f
 from pyspark.sql.types import *
-from pyspark.ml.classification import LogisticRegression
-from pyspark.ml import Pipeline
-from pyspark.ml.pipeline import Transformer
+from pyspark.ml.linalg import VectorUDT
+import joblib
+import pyspark.sql.functions as F
+import pandas as pd
+from pyspark.ml.linalg import DenseVector
 
-model_path = sys.argv[1]
-test_path = sys.argv[2]
-predict_path = sys.argv[3]
+path_test = 'Eelect_test_out'
+path_model = '6.joblib'
+path_predict = 'Eelect_hw6_prediction'
 
-spark = SparkSession.builder.getOrCreate()
-spark.sparkContext.setLogLevel('WARN')
-
-from pyspark.ml import Pipeline, PipelineModel
-
-model = PipelineModel.load(model_path)
-
-schema = StructType([
-    StructField("reviewText", StringType())
+schema = StructType(fields=[
+    StructField("features", ArrayType(FloatType(),False))
 ])
 
-df_test = spark.read.json(test_path, schema=schema).cache()
-df_test = df_test.withColumn('reviewText', f.regexp_replace('reviewText', '[^A-Za-z0-9\s]+', ''))
+df_test = spark.read.json('Eelect_test_out', schema=schema).cache()
 
-predictions = pipeline_model.transform(df_test)
-predictions.write.csv(predict_path)
+
+est = joblib.load(path_model)
+est_broadcast = spark.sparkContext.broadcast(est)
+
+
+@F.pandas_udf(FloatType())
+def predict(series):
+    predictions = est_broadcast.value.predict(series.tolist()) # Don't forget to use tolist() method
+    return pd.Series(predictions)
+
+df_test = df_test.withColumn("prediction", predict("features")).select('prediction')
+df_test.repartition(1).write.format("csv").mode("overwrite").save(path_predict)

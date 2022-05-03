@@ -57,7 +57,7 @@ train_df = train_df.withColumn("features", vector_to_array("features"))
 test_df = tokenizer.transform(test_df)
 test_df = swr.transform(test_df)
 test_df = hasher.transform(test_df)
-test_df = test_df.select(['label', 'features']).cache()
+test_df = test_df.select(['features']).cache()
 test_df.withColumn("features", vector_to_array("features")).show()
 test_df = test_df.withColumn("features", vector_to_array("features"))
 

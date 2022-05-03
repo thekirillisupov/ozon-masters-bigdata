@@ -2,6 +2,8 @@ from airflow import DAG
 from airflow.operators.bash import BashOperator
 from airflow.sensors.bash import BashSensor
 from datetime import datetime
+from airflow.contrib.operators.spark_submit_operator import SparkSubmitOperator
+from airflow.contrib.sensors.file_sensor import FileSensor
 
 base_dir = '{{ dag_run.conf["base_dir"] if dag_run else "" }}'
 
@@ -12,10 +14,11 @@ with DAG(
     start_date=datetime(2022, 5, 3)
 ) as dag:
 
-    feature_eng_task = BashOperator(
+    feature_eng_task = SparkSubmitOperator(
 	task_id="feuture_eng_task",
-	bash_command="python {}preprocessing.py /datasets/amazon/all_reviews_5_core_train_extra_small_sentiment.json /datasets/amazon/all_reviews_5_core_test_extra_small_features.json".format(base_dir)
-    )
+	application="{}preprocessing.py".format(base_dir),
+	env_vars={"PYSPARK_PYTHON": "dsenv"}
+)
 
     download_train_task = BashOperator(
 	task_id="download_train_task",
@@ -23,17 +26,19 @@ with DAG(
 )
     train_task = BashOperator(
 	task_id = "train_task",
-	bash_command="python {}train.py {}thekirillisupov_train_out /user/thekirillisupov/6.joblib".format(base_dir, base_dir)
+	bash_command="python {}train.py {}thekirillisupov_train_out {}6.joblib".format(base_dir, base_dir, base_dir)
 )
 
-    model_sensor = BashSensor(
+    model_sensor = FileSensor(
 	task_id = "model_sensor",
-	bash_command="hdfs dfs test -e /user/thekirillisupov/6.joblib"
+	poke_interval=5,
+	filepath="{}6.joblib".format(base_dir)
 )
 
-    predict_task = BashOperator(
+    predict_task = SparkSubmitOperator(
 	task_id = "predict_task",
-	bash_command =  "python {}predict.py /user/thekirillisupov/6.joblib {}thekirillisupov_train_out /user/thekirillisupov/thekirillisupov_hw6_prediction".format(base_dir, base_dir)
+	application =  "{}predict.py".format(base_dir),
+	env_vars={"PYSPARK_PYTHON": "dsenv"}
 )
 
     feature_eng_task >> download_train_task >> train_task >> model_sensor >> predict_task

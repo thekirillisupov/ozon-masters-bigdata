@@ -33,8 +33,8 @@ schema_test = StructType([
 ])
 
 
-train_path = sys.argv[1]
-test_path = sys.argv[2]
+train_path = /datasets/amazon/all_reviews_5_core_train_extra_small_sentiment.json
+test_path = /datasets/amazon/all_reviews_5_core_test_extra_small_features.json
 
 train_df = spark.read.json(train_path, schema=schema_train).cache()
 train_df = train_df.withColumn('reviewText', f.regexp_replace('reviewText', '[^A-Za-z0-9\s]+', ''))

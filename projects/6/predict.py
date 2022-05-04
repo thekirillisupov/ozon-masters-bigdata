@@ -18,7 +18,7 @@ spark = SparkSession.builder.getOrCreate()
 spark.sparkContext.setLogLevel('WARN')
 
 path_test = 'thekirillisupov_test_out'
-path_model = '/home/ubuntu/ozonmasters-checkers/hws/6/thekirillisupov/15/ozon-masters-bigdata/projects/6/6.joblib'
+path_model = '/home/ubuntu/ozonmasters-checkers/hws/6/thekirillisupov/16/ozon-masters-bigdata/projects/6/6.joblib'
 path_predict = 'thekirillisupov_hw6_prediction'
 
 schema = StructType(fields=[
@@ -26,7 +26,7 @@ schema = StructType(fields=[
     StructField("features", ArrayType(FloatType(),False))
 ])
 
-df_test = spark.read.json('thekirllisuppov_test_out', schema=schema).cache()
+df_test = spark.read.json(path_test, schema=schema).cache()
 
 
 est = joblib.load(path_model)

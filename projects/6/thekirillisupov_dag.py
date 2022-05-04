@@ -1,17 +1,20 @@
+import datetime
+import sys
+import pendulum
 from airflow import DAG
 from airflow.operators.bash import BashOperator
-from airflow.sensors.bash import BashSensor
-from datetime import datetime
+from airflow.operators.dummy import DummyOperator
 from airflow.contrib.operators.spark_submit_operator import SparkSubmitOperator
 from airflow.contrib.sensors.file_sensor import FileSensor
+
 
 base_dir = '{{ dag_run.conf["base_dir"] if dag_run else "" }}'
 
 with DAG(
-    "thekirillisupov_dag",
+    dag_id="thekirillisupov_dag",
     schedule_interval=None,
     catchup=False,
-    start_date=datetime(2022, 5, 3)
+    start_date=datetime(22, 5, 3)
 ) as dag:
 
     feature_eng_task = BashOperator(

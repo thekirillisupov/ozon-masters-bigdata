@@ -3,10 +3,8 @@ from pyspark import SparkConf
 from pyspark.sql import SparkSession
 import pyspark.sql.functions as f
 from pyspark.ml.functions import vector_to_array
-
 from pyspark import SparkConf
 from pyspark.sql import SparkSession
-
 from pyspark.sql.types import *
 from pyspark.ml.linalg import VectorUDT
 import joblib

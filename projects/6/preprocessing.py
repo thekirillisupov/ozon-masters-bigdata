@@ -1,13 +1,9 @@
-import os
-import sys
 
 from pyspark import SparkConf
 from pyspark.sql import SparkSession
-from pyspark.ml.classification import LogisticRegression
 from pyspark.sql.types import *
 from pyspark.sql.functions import lower, col
 from pyspark.ml.feature import *
-from pyspark.ml import Pipeline
 from pyspark import SparkConf
 from pyspark.sql import SparkSession
 import pyspark.sql.functions as f
@@ -16,11 +12,8 @@ from pyspark.ml.functions import vector_to_array
 from pyspark import SparkConf
 from pyspark.sql import SparkSession
 
-conf = SparkConf()
-
-spark = SparkSession.builder.config(conf=conf).appName("Spark SQL").getOrCreate()
-
-from pyspark.sql.types import *
+spark = SparkSession.builder.getOrCreate()
+spark.sparkContext.setLogLevel('WARN')
 
 schema_train = StructType([
     StructField("label", FloatType()),
@@ -61,5 +54,5 @@ test_df = test_df.select(['features']).cache()
 test_df.withColumn("features", vector_to_array("features")).show()
 test_df = test_df.withColumn("features", vector_to_array("features"))
 
-train_df.write.json("thekirillisupov_train_out")
-test_df.write.json("thekirllisupov_test_out")
+train_df.repartition(1).write.format("json").mode("overwrite").save(thekirllisupov_train_out)
+test_df.repartition(1).write.format("json").mode("overwrite").save(thekirllisupov_test_out)

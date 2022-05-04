@@ -1,8 +1,7 @@
 from sklearn.linear_model import LogisticRegression
 import sys
-from sklearn.extarnals import joblib
-
-
+import joblib
+import pandas as pd
 
 path_train = sys.argv[1]
 path_model = sys.argv[2]

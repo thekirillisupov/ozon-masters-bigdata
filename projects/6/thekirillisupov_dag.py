@@ -19,7 +19,7 @@ with DAG(
 
     feature_eng_task = BashOperator(
 	task_id="feuture_eng_task",
-	bash_command="PYSPARK_PYTHON=/opt/conda/envs/dsenv/bin/python /usr/bin/spark-submit --master yarn --conf spark.yarn.appMasterEnv.PYSPARK_PYTHON=/opt/conda/envs/dsenv/bin/python --name arrow-spark --queue default --archives /home/users/thekirillisupov/dsenv.tar.gz {}/preprocessing.py".format(base_dir)
+	bash_command=f'PYSPARK_PYTHON=/opt/conda/envs/dsenv/bin/python /usr/bin/spark-submit --master yarn --conf spark.yarn.appMasterEnv.PYSPARK_PYTHON=/opt/conda/envs/dsenv/bin/python --name arrow-spark --queue default --archives /home/users/thekirillisupov/dsenv.tar.gz {base_dir}/preprocessing.py'
 )
 
     download_train_task = BashOperator(

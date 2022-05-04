@@ -1,4 +1,4 @@
-from datetime import datetime
+import datetime
 import sys
 import pendulum
 from airflow import DAG
@@ -9,36 +9,21 @@ from airflow.contrib.sensors.file_sensor import FileSensor
 
 
 base_dir = '{{ dag_run.conf["base_dir"] if dag_run else "" }}'
-
+env_vars = {'PYSPARK_PYTHON' : 'dsenv'}
+fe_command = f'PYSPARK_PYTHON=/opt/conda/envs/dsenv/bin/python /usr/bin/spark-submit --master yarn --conf spark.yarn.appMasterEnv.PYSPARK_PYTHON=/opt/conda/envs/dsenv/bin/python --name arrow-spark --queue default --archives /home/users/thekirillisupov/dsenv.tar.gz {base_dir}/preprocessing.py'
+predict_command =  f'PYSPARK_PYTHON=/opt/conda/envs/dsenv/bin/python /usr/bin/spark-submit --master yarn --conf spark.yarn.appMasterEnv.PYSPARK_PYTHON=/opt/conda/envs/dsenv/bin/python --name arrow-spark --queue default --archives /home/users/thekirillisupov/dsenv.tar.gz {base_dir}/predict.py'
 with DAG(
-    dag_id="thekirillisupov_dag",
+    dag_id='thekirillisupov_dag',
     schedule_interval=None,
     catchup=False,
-    start_date=datetime(22, 5, 3)
+    start_date = datetime.datetime(22, 5, 1)
 ) as dag:
+    #fe = SparkSubmitOperator(task_id='feature_eng_task', application = f'{base_dir}/fe.py', env_vars = env_vars)
+    fe =  BashOperator( task_id='feature_eng_task', bash_command=fe_command)
+    down_train = BashOperator( task_id='train_download_task', bash_command=f'hdfs dfs -get thekirillisupov_train_out/*.json {base_dir}/thekirillisupov_train_out_local')
+    train_model = BashOperator( task_id='train_task', bash_command=f'/opt/conda/envs/dsenv/bin/python {base_dir}/train.py {base_dir}/thekirillisupov_train_out_local {base_dir}/6.joblib')
+    model_sensor = FileSensor(task_id = 'model_sensor', poke_interval=5,  filepath = f'{base_dir}/6.joblib')
+    #predict = SparkSubmitOperator(task_id='predict_task', application=f'{base_dir}/predict.py', env_vars = env_vars)
+    predict = BashOperator(task_id='predict_task', bash_command=predict_command)
 
-    feature_eng_task = BashOperator(
-	task_id="feuture_eng_task",
-	bash_command=f'PYSPARK_PYTHON=/opt/conda/envs/dsenv/bin/python /usr/bin/spark-submit --master yarn --conf spark.yarn.appMasterEnv.PYSPARK_PYTHON=/opt/conda/envs/dsenv/bin/python --name arrow-spark --queue default --archives /home/users/thekirillisupov/dsenv.tar.gz {base_dir}/preprocessing.py'
-)
-
-    download_train_task = BashOperator(
-	task_id="download_train_task",
-	bash_command="hdfs dfs -get thekirillisupov_train_out/*.json {}thekirillisupov_train_out_local".format(base_dir)
-)
-    train_task = BashOperator(
-	task_id = "train_task",
-	bash_command="/opt/conda/envs/dsenv/bin/python {}/train.py {}/thekirillisupov_train_out_local {}/6.joblib".format(base_dir, base_dir, base_dir)
-)
-
-    model_sensor = FileSensor(
-	task_id = "model_sensor",
-	filepath="{}6.joblib".format(base_dir)
-)
-
-    predict_task = BashOperator(
-	task_id = "predict_task",
-	bash_command="PYSPARK_PYTHON=/opt/conda/envs/dsenv/bin/python /usr/bin/spark-submit --master yarn --conf spark.yarn.appMasterEnv.PYSPARK_PYTHON=/opt/conda/envs/dsenv/bin/python --name arrow-spark --queue default --archives /home/users/thekirillisupov/dsenv.tar.gz {}/predict.py".format(base_dir)
-)
-
-    feature_eng_task >> download_train_task >> train_task >> model_sensor >> predict_task
+    fe >> down_train >> train_model >> model_sensor >> predict

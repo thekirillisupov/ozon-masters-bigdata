@@ -9,7 +9,6 @@ from airflow.contrib.sensors.file_sensor import FileSensor
 
 
 base_dir = '{{ dag_run.conf["base_dir"] if dag_run else "" }}'
-env_vars = {'PYSPARK_PYTHON' : 'dsenv'}
 
 with DAG(
     dag_id='thekirillisupov_dag',

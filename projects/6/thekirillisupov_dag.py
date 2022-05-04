@@ -10,8 +10,8 @@ from airflow.contrib.sensors.file_sensor import FileSensor
 
 base_dir = '{{ dag_run.conf["base_dir"] if dag_run else "" }}'
 env_vars = {'PYSPARK_PYTHON' : 'dsenv'}
-fe_command = f'PYSPARK_PYTHON=/opt/conda/envs/dsenv/bin/python /usr/bin/spark-submit --master yarn --conf spark.yarn.appMasterEnv.PYSPARK_PYTHON=/opt/conda/envs/dsenv/bin/python --name arrow-spark --queue default --archives /home/users/thekirillisupov/dsenv.tar.gz {base_dir}/preprocessing.py'
-predict_command =  f'PYSPARK_PYTHON=/opt/conda/envs/dsenv/bin/python /usr/bin/spark-submit --master yarn --conf spark.yarn.appMasterEnv.PYSPARK_PYTHON=/opt/conda/envs/dsenv/bin/python --name arrow-spark --queue default --archives /home/users/thekirillisupov/dsenv.tar.gz {base_dir}/predict.py'
+fe_command = f'PYSPARK_PYTHON=/opt/conda/envs/dsenv/bin/python /usr/bin/spark-submit --master yarn --conf spark.yarn.appMasterEnv.PYSPARK_PYTHON=/opt/conda/envs/dsenv/bin/python --name arrow-spark --queue default --archives /home/users/Eelect/dsenv.tar.gz {base_dir}/preprocessing.py'
+predict_command =  f'PYSPARK_PYTHON=/opt/conda/envs/dsenv/bin/python /usr/bin/spark-submit --master yarn --conf spark.yarn.appMasterEnv.PYSPARK_PYTHON=/opt/conda/envs/dsenv/bin/python --name arrow-spark --queue default --archives /home/users/Eelect/dsenv.tar.gz {base_dir}/predict.py'
 with DAG(
     dag_id='thekirillisupov_dag',
     schedule_interval=None,

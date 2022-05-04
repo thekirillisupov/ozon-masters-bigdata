@@ -34,7 +34,7 @@ est_broadcast = spark.sparkContext.broadcast(est)
 
 @F.pandas_udf(FloatType())
 def predict(series):
-    predictions = est_broadcast.value.predict(series.tolist()) # Don't forget to use tolist() method
+    predictions = est_broadcast.value.predict(series.tolist())
     return pd.Series(predictions)
 
 df_test = df_test.select("id", "features").withColumn("prediction", predict("features"))

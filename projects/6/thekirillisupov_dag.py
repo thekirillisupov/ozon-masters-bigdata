@@ -14,10 +14,9 @@ with DAG(
     start_date=datetime(2022, 5, 3)
 ) as dag:
 
-    feature_eng_task = SparkSubmitOperator(
+    feature_eng_task = BashOperator(
 	task_id="feuture_eng_task",
-	application="{}/preprocessing.py".format(base_dir),
-	env_vars={"PYSPARK_PYTHON": "/opt/conda/envs/dsenv/bin/python"}
+	bash_command="PYSPARK_PYTHON=/opt/conda/envs/dsenv/bin/python /usr/bin/spark-submit --master yarn --conf spark.yarn.appMasterEnv.PYSPARK_PYTHON=/opt/conda/envs/dsenv/bin/python --name arrow-spark --queue default --archives /home/users/thekirillisupov/dsenv.tar.gz {}/preprocessing.py".format(base_dir)
 )
 
     download_train_task = BashOperator(
@@ -26,19 +25,17 @@ with DAG(
 )
     train_task = BashOperator(
 	task_id = "train_task",
-	bash_command="python3 {}train.py {}thekirillisupov_train_out_local {}6.joblib".format(base_dir, base_dir, base_dir)
+	bash_command="/opt/conda/envs/dsenv/bin/python {}/train.py {}/thekirillisupov_train_out_local {}/6.joblib".format(base_dir, base_dir, base_dir)
 )
 
     model_sensor = FileSensor(
 	task_id = "model_sensor",
-	poke_interval=5,
 	filepath="{}6.joblib".format(base_dir)
 )
 
-    predict_task = SparkSubmitOperator(
+    predict_task = BashOperator(
 	task_id = "predict_task",
-	application =  "{}predict.py".format(base_dir),
-	env_vars={"PYSPARK_PYTHON": "/opt/conda/envs/dsenv/bin/python"}
+	bash_command="PYSPARK_PYTHON=/opt/conda/envs/dsenv/bin/python /usr/bin/spark-submit --master yarn --conf spark.yarn.appMasterEnv.PYSPARK_PYTHON=/opt/conda/envs/dsenv/bin/python --name arrow-spark --queue default --archives /home/users/thekirillisupov/dsenv.tar.gz {}/predict.py".format(base_dir)
 )
 
     feature_eng_task >> download_train_task >> train_task >> model_sensor >> predict_task

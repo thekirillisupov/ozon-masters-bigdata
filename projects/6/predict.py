@@ -11,12 +11,13 @@ import joblib
 import pyspark.sql.functions as F
 import pandas as pd
 from pyspark.ml.linalg import DenseVector
+import sys
 
 spark = SparkSession.builder.getOrCreate()
 spark.sparkContext.setLogLevel('WARN')
 
 path_test = 'thekirillisupov_test_out'
-path_model = '/home/ubuntu/ozonmasters-checkers/hws/6/thekirillisupov/18/ozon-masters-bigdata/projects/6/6.joblib'
+path_model = sys.argv[1]
 path_predict = 'thekirillisupov_hw6_prediction'
 
 schema = StructType(fields=[

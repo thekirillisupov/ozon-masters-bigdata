@@ -24,6 +24,6 @@ with DAG(
     
     model_sensor = FileSensor(task_id = 'model_sensor', poke_interval=5,  filepath = f'{base_dir}/6.joblib')
     
-    predict_task = BashOperator(task_id='predict_task', bash_command=f'PYSPARK_PYTHON=/opt/conda/envs/dsenv/bin/python /usr/bin/spark-submit --master yarn --conf spark.yarn.appMasterEnv.PYSPARK_PYTHON=/opt/conda/envs/dsenv/bin/python --name arrow-spark --queue default {base_dir}/predict.py')
+    predict_task = BashOperator(task_id='predict_task', bash_command=f'PYSPARK_PYTHON=/opt/conda/envs/dsenv/bin/python /usr/bin/spark-submit --master yarn --conf spark.yarn.appMasterEnv.PYSPARK_PYTHON=/opt/conda/envs/dsenv/bin/python --name arrow-spark --queue default {base_dir}/predict.py {base_dir}')
 
     feature_eng_task >> download_train_task >> train_model >> model_sensor >> predict_task

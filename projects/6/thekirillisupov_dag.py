@@ -19,7 +19,7 @@ with DAG(
 ) as dag:
     feature_eng_task =  BashOperator(task_id='feature_eng_task', bash_command=f'PYSPARK_PYTHON=/opt/conda/envs/dsenv/bin/python /usr/bin/spark-submit --master yarn --conf spark.yarn.appMasterEnv.PYSPARK_PYTHON=/opt/conda/envs/dsenv/bin/python --name arrow-spark --queue default {base_dir}/preprocessing.py')
     
-    download_train_task = BashOperator(ask_id='train_download_task', bash_command=f'hdfs dfs -get thekirillisupov_train_out/*.json {base_dir}/thekirillisupov_train_out_local')
+    download_train_task = BashOperator(task_id='train_download_task', bash_command=f'hdfs dfs -get thekirillisupov_train_out/*.json {base_dir}/thekirillisupov_train_out_local')
     
     train_model = BashOperator(task_id='train_task', bash_command=f'/opt/conda/envs/dsenv/bin/python {base_dir}/train.py {base_dir}/thekirillisupov_train_out_local {base_dir}/6.joblib')
     
